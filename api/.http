@@ -1,0 +1,25 @@
+POST /courses
+Content-Type: application/json
+
+{
+  "title": "Go desde cero",
+  "description": "Curso completo de Go",
+  "price": 29.99
+}
+
+GET /courses
+
+
+GET /courses/{id}
+
+
+
+POST /courses/{courseId}/lessons
+Content-Type: application/json
+
+{
+  "title": "Introducción",
+  "content": "Bienvenida al curso",
+  "video_url": "https://youtube.com/...",
+  "order": 1
+}
