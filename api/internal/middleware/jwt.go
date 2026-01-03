@@ -2,50 +2,45 @@ package middleware
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
-type SupabaseClaims struct {
-	Email string `json:"email"`
-	Role  string `json:"role"`
-	jwt.RegisteredClaims
-}
-
-func JWT(secret string) echo.MiddlewareFunc {
+func JWT() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			authHeader := c.Request().Header.Get("Authorization")
-			if authHeader == "" {
+			auth := c.Request().Header.Get("Authorization")
+			if auth == "" {
 				return c.JSON(http.StatusUnauthorized, echo.Map{
-					"error": "missing authorization header",
+					"error": "missing token",
 				})
 			}
 
-			parts := strings.Split(authHeader, " ")
-			if len(parts) != 2 || parts[0] != "Bearer" {
+			tokenString := auth[len("Bearer "):]
+
+			token, _, err := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
+			if err != nil {
 				return c.JSON(http.StatusUnauthorized, echo.Map{
-					"error": "invalid authorization format",
+					"error": "invalid token",
 				})
 			}
 
-			tokenStr := parts[1]
+			claims := token.Claims.(jwt.MapClaims)
+			role := "user"
 
-			token, err := jwt.ParseWithClaims(tokenStr, &SupabaseClaims{}, func(token *jwt.Token) (interface{}, error) {
-				return []byte(secret), nil
-			})
-
-			if err != nil || !token.Valid {
-				return c.JSON(http.StatusUnauthorized, echo.Map{
-					"error": "invalid or expired token",
-				})
+			if meta, ok := claims["user_metadata"].(map[string]interface{}); ok {
+				if r, ok := meta["role"].(string); ok {
+					role = r
+				}
 			}
 
-			claims := token.Claims.(*SupabaseClaims)
-			c.Set("user_email", claims.Email)
-			c.Set("user_role", claims.Role)
+			c.Set("user_role", role)
+
+			// datos útiles
+			c.Set("user_email", claims["email"])
+			c.Set("user_id", claims["sub"])
+
 			return next(c)
 		}
 	}

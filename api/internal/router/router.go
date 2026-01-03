@@ -14,7 +14,7 @@ import (
 func Register(
 	e *echo.Echo,
 	db *mongo.Database,
-	jwtSecret string,
+	jwksURL string,
 ) {
 	// =====================
 	// Infraestructura
@@ -55,7 +55,7 @@ func Register(
 	// =====================
 
 	auth := e.Group("/api")
-	auth.Use(authMiddleware.JWT(jwtSecret))
+	auth.Use(authMiddleware.JWT())
 
 	// endpoint de prueba
 	auth.GET("/me", func(c echo.Context) error {

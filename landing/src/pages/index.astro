@@ -1,0 +1,40 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCourses } from "../lib/api";
+
+let courses = [];
+let error = null;
+
+try {
+    courses = await getCourses();
+} catch (e) {
+    error = "No se pudieron cargar los cursos";
+}
+---
+
+<BaseLayout title="Cursos online">
+    <h1>Cursos disponibles</h1>
+
+    {error && <p style="color:red;">{error}</p>}
+
+    {
+        !error && courses.length === 0 && (
+            <p>No hay cursos disponibles por el momento.</p>
+        )
+    }
+
+    {
+        !error && courses.length > 0 && (
+            <ul>
+                {courses.map((course) => (
+                    <li>
+                        <a href={`/courses/${course.id}`}>
+                            <strong>{course.title}</strong>
+                        </a>
+                        <p>{course.description}</p>
+                    </li>
+                ))}
+            </ul>
+        )
+    }
+</BaseLayout>

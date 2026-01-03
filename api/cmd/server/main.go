@@ -34,7 +34,7 @@ func main() {
 	router.Register(
 		e,
 		mongo.DB,
-		cfg.SupabaseJWTSecret,
+		cfg.SupabaseJWKSURL,
 	)
 
 	// 5️⃣ Levantar servidor

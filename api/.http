@@ -1,25 +1,8 @@
-POST /courses
+POST http://localhost:8080/api/admin/courses
 Content-Type: application/json
+Authorization: Bearer TU_JWT
 
 {
-  "title": "Go desde cero",
-  "description": "Curso completo de Go",
-  "price": 29.99
-}
-
-GET /courses
-
-
-GET /courses/{id}
-
-
-
-POST /courses/{courseId}/lessons
-Content-Type: application/json
-
-{
-  "title": "Introducción",
-  "content": "Bienvenida al curso",
-  "video_url": "https://youtube.com/...",
-  "order": 1
+  "title": "Curso de Programación Web",
+  "description": "Aprendé a crear aplicaciones web desde cero"
 }

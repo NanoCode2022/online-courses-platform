@@ -1,0 +1,47 @@
+---
+export const prerender = false;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCourse } from "../../lib/api";
+
+const { id } = Astro.params;
+const course = await getCourse(id);
+---
+
+<BaseLayout title={course.title}>
+    <h1>{course.title}</h1>
+
+    <p>{course.description}</p>
+
+    <hr />
+
+    <h3>¿Qué vas a aprender?</h3>
+    <ul>
+        {course.objectives?.map((obj) => <li>{obj}</li>)}
+    </ul>
+
+    <hr />
+
+    <a href="http://localhost:4200/login">
+        <div id="cta"></div>
+    </a>
+</BaseLayout>
+
+<script>
+    const cta = document.getElementById("cta");
+    const token = localStorage.getItem("supabase.auth.token");
+
+    if (!token) {
+        cta.innerHTML = `
+      <a href="http://localhost:4200/login">
+        <button>Iniciar sesión para comprar</button>
+      </a>
+    `;
+    } else {
+        cta.innerHTML = `
+      <a href="http://localhost:4200/dashboard">
+        <button>Ir al dashboard</button>
+      </a>
+    `;
+    }
+</script>
